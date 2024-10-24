@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">ToDoApp</string>
+
+    <string name="task_category_daily">Diario</string>
+    <string name="task_category_other">Otros</string>
+    <string name="task_category_personal">Personal</string>
+    <string name="task_category_weekly">Semanal</string>
+
+    <string name="categories">Categorias:</string>
+    <string name="task">Tareas:</string>
+
+    <string name="insert_task_name">Añade la tarea:</string>
+
+    <string name="accept_button">Aceptar</string>
+</resources>

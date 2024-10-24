@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="250dp"
+    android:layout_height="wrap_content"
+    android:background="@color/my_dark_blue"
+    android:orientation="vertical"
+    android:paddingHorizontal="15dp"
+    android:paddingVertical="5dp">
+
+    <EditText
+        android:id="@+id/et_NameTask"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autofillHints="true"
+        android:backgroundTint="@color/white"
+        android:hint="@string/insert_task_name"
+        android:inputType="text"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        android:textSize="18sp"
+        />
+
+    <RadioGroup
+        android:id="@+id/Radio_Group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/rb_Personal"
+            style="@style/DialogRadioButton"
+            android:buttonTint="@color/my_personal_color"
+            android:text="@string/task_category_personal" />
+
+        <RadioButton
+            android:id="@+id/rb_Daily"
+            style="@style/DialogRadioButton"
+            android:buttonTint="@color/my_daily_color"
+            android:text="@string/task_category_daily" />
+
+        <RadioButton
+            android:id="@+id/rb_Weekly"
+            style="@style/DialogRadioButton"
+            android:buttonTint="@color/my_weekly_color"
+            android:text="@string/task_category_weekly" />
+
+        <RadioButton
+            android:id="@+id/rb_Other"
+            style="@style/DialogRadioButton"
+            android:buttonTint="@color/my_other_color"
+            android:checked="true"
+            android:text="@string/task_category_other" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/btn_AddTask"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/my_orange"
+        android:text="@string/accept_button"
+        android:textStyle="bold" />
+
+</LinearLayout>
