@@ -2,6 +2,7 @@ package com.juani48.todoapp.ui
 
 import android.app.Dialog
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioButton
@@ -66,7 +67,7 @@ class MainActivity : AppCompatActivity() {
             Task("Tarea 2", TaskCategory.Daily),
             Task("Tarea 3", TaskCategory.Personal),
             Task("Tarea 4", TaskCategory.Weekly),
-            Task("Tarea 5", TaskCategory.Other),
+            Task("Tarea 5", TaskCategory.Other)
         )
     }
 
@@ -80,7 +81,10 @@ class MainActivity : AppCompatActivity() {
 
         // RecyclerView Tasks
         this.tasksAdapter =
-            TasksAdapter(this.tasksList) { position -> this.onTaskSelected(position) }
+            TasksAdapter(
+                this.tasksList,
+                { position -> this.onTaskSelected(position) },
+                { position -> this.onDeleteSelected(position) })
         this.rvTask.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         this.rvTask.adapter = this.tasksAdapter
     }
@@ -102,6 +106,16 @@ class MainActivity : AppCompatActivity() {
         newTasks[position].selected = !newTasks[position].selected
         this.tasksAdapter.notifyItemChanged(position)
         this.updateTasks()
+    }
+
+    // Funcion lambda de borrar tareas
+    private fun onDeleteSelected(position: Int) {
+        val list = this.filterList()
+        val deleteTask = list[position]
+        this.tasksList.remove(deleteTask)
+        list.remove(deleteTask)
+        tasksAdapter.tasks = list
+        this.tasksAdapter.notifyDataSetChanged()
     }
 
     // Listener de fob
@@ -138,12 +152,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Retorla la lista actual de tareas
-    private fun filterList(): List<Task>{
+    private fun filterList(): MutableList<Task> {
         val categoriesSelected: List<TaskCategory> = this.categoryList.filter { x -> x.selected }
-        if (categoriesSelected.isNotEmpty()) {
-            return tasksList.filter { x -> categoriesSelected.contains(x.category) }
-        } else {
-            return this.tasksList
+        return if (categoriesSelected.isNotEmpty()) {
+            tasksList.filter { x -> categoriesSelected.contains(x.category) }.toMutableList()
+        }else {
+            this.tasksList
         }
     }
 }

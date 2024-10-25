@@ -6,12 +6,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.juani48.todoapp.R
 import com.juani48.todoapp.application.entitys.Task
 
-class TasksAdapter(public var tasks: List<Task>, private val onTaskSelected: (Int) -> Unit) :
+class TasksAdapter(
+    public var tasks: MutableList<Task>,
+    private val onTaskSelected: (Int) -> Unit,
+    private val onDeleteSelected: (Int) -> Unit
+) :
     RecyclerView.Adapter<TasksViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TasksViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_task, parent, false)
-        return TasksViewHolder(view, onTaskSelected)
+        return TasksViewHolder(view, this.onTaskSelected, this.onDeleteSelected)
     }
 
     override fun onBindViewHolder(holder: TasksViewHolder, position: Int) {
