@@ -8,7 +8,7 @@ import com.juani48.todoapp.application.TaskCategory
 
 //"Pinta" cada elementos de la lista ´categories´
 class CategoriesAdapter(
-    private val categoires: List<TaskCategory>,
+    private val categories: List<TaskCategory>,
     private val onCategorySelected: (Int) -> Unit)
     : RecyclerView.Adapter<CategoriesViewHolder>() {
 
@@ -20,11 +20,11 @@ class CategoriesAdapter(
     }
 
     //Cantidad de elementos a mostrar
-    override fun getItemCount(): Int = this.categoires.size
+    override fun getItemCount(): Int = this.categories.size
 
     // Agrega a la View de onCrateViewHolder la informacion para "pintarla"
     override fun onBindViewHolder(holder: CategoriesViewHolder, position: Int) {
-        holder.render(this.categoires[position])
+        holder.render(this.categories[position])
         holder.itemView.setOnClickListener{ this.onCategorySelected(position) }
     }
 }

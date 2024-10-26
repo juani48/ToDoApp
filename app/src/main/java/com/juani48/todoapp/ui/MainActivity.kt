@@ -2,120 +2,107 @@ package com.juani48.todoapp.ui
 
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
+import android.view.View
 import android.widget.Button
-import android.widget.EditText
-import android.widget.RadioButton
-import android.widget.RadioGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.juani48.todoapp.R
-import com.juani48.todoapp.application.TaskCategory
-import com.juani48.todoapp.application.entitys.Task
+import com.juani48.todoapp.databinding.ActivityMainBinding
 import com.juani48.todoapp.items.categories.CategoriesAdapter
 import com.juani48.todoapp.items.tasks.TasksAdapter
+import com.juani48.todoapp.viewmodel.TaskViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    // Lista de categorias
-    private lateinit var rvCategories: RecyclerView
+    // ViewModel
+    @Inject lateinit var taskViewModel: TaskViewModel
+
+    // RecyclerView CategoriesAdapter
     private lateinit var categoriesAdapter: CategoriesAdapter
 
-    //
-    private val categoryList = listOf(
-        TaskCategory.Personal,
-        TaskCategory.Daily,
-        TaskCategory.Weekly,
-        TaskCategory.Other
-    )
-
-    // Lista de tareas
-    private lateinit var rvTask: RecyclerView
+    // RecyclerView TasksAdapter
     private lateinit var tasksAdapter: TasksAdapter
 
-    //
-    private lateinit var tasksList: MutableList<Task>
 
-    //
-    private lateinit var fobAddTask: FloatingActionButton
+    // Dynamic Binding
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        this.binding = ActivityMainBinding.inflate(layoutInflater) // init binding
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        setContentView(binding.root) // root binding
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.linearLayout)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        this.initComponents()
-        this.initUI()
-        this.initListeners()
-    }
 
-    private fun initComponents() {
-        this.rvCategories = findViewById(R.id.rv_Categories)
-        this.rvTask = findViewById(R.id.rv_Task)
-        this.fobAddTask = findViewById(R.id.fab_AddTask)
-        this.tasksList = mutableListOf(
-            Task("Tarea 1", TaskCategory.Other),
-            Task("Tarea 2", TaskCategory.Daily),
-            Task("Tarea 3", TaskCategory.Personal),
-            Task("Tarea 4", TaskCategory.Weekly),
-            Task("Tarea 5", TaskCategory.Other)
-        )
+        this.taskViewModel.onCreate() // init ViewModel
+        this.initUI()
+        this.binding.fabAddTask.setOnClickListener { this.showDialog() } // Listener
+        this.initObservers()
     }
 
     private fun initUI() {
         // RecyclerView Categories
+            // init adapter
         this.categoriesAdapter =
-            CategoriesAdapter(this.categoryList) { position -> this.onCategorySelected(position) }
-        this.rvCategories.layoutManager =
+            CategoriesAdapter(this.taskViewModel.getCategoriesList()) { position -> this.onCategorySelected(position) }
+            // init RecyclerView
+        this.binding.rvCategories.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        this.rvCategories.adapter = this.categoriesAdapter
+            // set adapter in RecyclerView
+        this.binding.rvCategories.adapter = this.categoriesAdapter
 
         // RecyclerView Tasks
+            // init adapter
         this.tasksAdapter =
             TasksAdapter(
-                this.tasksList,
+                this.taskViewModel.getTasksList(),
                 { position -> this.onTaskSelected(position) },
-                { position -> this.onDeleteSelected(position) })
-        this.rvTask.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        this.rvTask.adapter = this.tasksAdapter
+                { position -> this.onDeleteSelected(position) }
+            )
+            // init RecyclerView
+        this.binding.rvTask.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+            // set adapter in RecyclerView
+        this.binding.rvTask.adapter = this.tasksAdapter
     }
 
-    private fun initListeners() {
-        this.fobAddTask.setOnClickListener { this.showDialog() }
+    private fun initObservers(){
+        // if tasks list change -> upgrade task adapter
+        this.taskViewModel.taskModel.observe(this, Observer
+        { this.tasksAdapter.tasks = it; this.tasksAdapter.notifyDataSetChanged() })
+
+        // if categories list change -> upgrade categories adapter
+        this.taskViewModel.categoryModel.observe(this, Observer
+        { this.categoriesAdapter.categories = it; this.categoriesAdapter.notifyDataSetChanged() })
+
+        this.taskViewModel.isLoading.observe(this, Observer {
+            this.binding.linearLayout.visibility = if(!it){View.VISIBLE}else{View.GONE}
+            this.binding.progressBar.visibility = if(it){View.VISIBLE}else{View.GONE} })
     }
 
     // Funcion lambda de categorias
     private fun onCategorySelected(position: Int) {
-        this.categoryList[position].selected = !this.categoryList[position].selected
-        this.categoriesAdapter.notifyItemChanged(position)
-        this.updateTasks()
+        this.taskViewModel.onCategorySelected(position)
     }
 
     // Funcion lambda de tareas
     private fun onTaskSelected(position: Int) {
-        val newTasks: List<Task> = this.filterList()
-        newTasks[position].selected = !newTasks[position].selected
-        this.tasksAdapter.notifyItemChanged(position)
-        this.updateTasks()
+        this.taskViewModel.onTaskSelected(position)
     }
 
     // Funcion lambda de borrar tareas
     private fun onDeleteSelected(position: Int) {
-        val list = this.filterList()
-        val deleteTask = list[position]
-        this.tasksList.remove(deleteTask)
-        list.remove(deleteTask)
-        tasksAdapter.tasks = list
-        this.tasksAdapter.notifyDataSetChanged()
+        this.taskViewModel.onDeleteSelected(position)
     }
 
     // Listener de fob
@@ -124,40 +111,10 @@ class MainActivity : AppCompatActivity() {
         dialog.setContentView(R.layout.dialog_new_task)
 
         val btnAddTask: Button = dialog.findViewById(R.id.btn_AddTask)
-        val etTaskName: EditText = dialog.findViewById(R.id.et_NameTask)
-        val radioGroup: RadioGroup = dialog.findViewById(R.id.Radio_Group)
-
         btnAddTask.setOnClickListener {
-            if (etTaskName.text.toString() != "") {
-                val idSelected = radioGroup.checkedRadioButtonId
-                val selectedRadioButton: RadioButton = radioGroup.findViewById(idSelected)
-                val taskCategory: TaskCategory = when (selectedRadioButton.text) {
-                    getString(R.string.task_category_personal) -> TaskCategory.Personal
-                    getString(R.string.task_category_daily) -> TaskCategory.Daily
-                    getString(R.string.task_category_weekly) -> TaskCategory.Weekly
-                    else -> TaskCategory.Other
-                }
-                this.tasksList.add(Task(etTaskName.text.toString(), taskCategory))
-                this.updateTasks()
-                dialog.hide()
-            }
+            this.taskViewModel.addTask(dialog)
         }
         dialog.show()
     }
 
-    // Actualiza el listado de tasks
-    private fun updateTasks() {
-        tasksAdapter.tasks = this.filterList()
-        this.tasksAdapter.notifyDataSetChanged()
-    }
-
-    // Retorla la lista actual de tareas
-    private fun filterList(): MutableList<Task> {
-        val categoriesSelected: List<TaskCategory> = this.categoryList.filter { x -> x.selected }
-        return if (categoriesSelected.isNotEmpty()) {
-            tasksList.filter { x -> categoriesSelected.contains(x.category) }.toMutableList()
-        }else {
-            this.tasksList
-        }
-    }
 }

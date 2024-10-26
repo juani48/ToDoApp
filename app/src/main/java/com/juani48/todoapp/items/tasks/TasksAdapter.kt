@@ -7,7 +7,7 @@ import com.juani48.todoapp.R
 import com.juani48.todoapp.application.entitys.Task
 
 class TasksAdapter(
-    public var tasks: MutableList<Task>,
+    public var tasks: List<Task>,
     private val onTaskSelected: (Int) -> Unit,
     private val onDeleteSelected: (Int) -> Unit
 ) :
