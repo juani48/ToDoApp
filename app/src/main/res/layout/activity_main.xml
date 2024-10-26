@@ -53,6 +53,7 @@
         android:layout_gravity="end|bottom"
         android:layout_marginHorizontal="30dp"
         android:layout_marginVertical="75dp"
+        android:contentDescription="x"
         android:src="@android:drawable/ic_input_add"
         app:backgroundTint="@color/my_orange"
         app:fabSize="normal"

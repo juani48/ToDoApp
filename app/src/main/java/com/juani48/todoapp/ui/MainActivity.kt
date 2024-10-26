@@ -2,7 +2,6 @@ package com.juani48.todoapp.ui
 
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioButton
@@ -17,10 +16,23 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.juani48.todoapp.R
 import com.juani48.todoapp.application.TaskCategory
 import com.juani48.todoapp.application.entitys.Task
+import com.juani48.todoapp.application.usecase.AddTaskUseCase
+import com.juani48.todoapp.application.usecase.DeleteTaskUseCase
+import com.juani48.todoapp.application.usecase.GetAllTaskUseCase
 import com.juani48.todoapp.items.categories.CategoriesAdapter
 import com.juani48.todoapp.items.tasks.TasksAdapter
+import com.juani48.todoapp.repository.TaskRepository
 
 class MainActivity : AppCompatActivity() {
+
+   // MutableList
+    // Repository
+    private val repository = TaskRepository()
+
+    // Usecases
+    private val getAllTask = GetAllTaskUseCase(this.repository)
+    private val deleteTask = DeleteTaskUseCase(this.repository)
+    private val addTask = AddTaskUseCase(this.repository)
 
     // Lista de categorias
     private lateinit var rvCategories: RecyclerView
@@ -39,9 +51,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tasksAdapter: TasksAdapter
 
     //
-    private lateinit var tasksList: MutableList<Task>
-
-    //
     private lateinit var fobAddTask: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,6 +62,7 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
         this.initComponents()
         this.initUI()
         this.initListeners()
@@ -62,13 +72,6 @@ class MainActivity : AppCompatActivity() {
         this.rvCategories = findViewById(R.id.rv_Categories)
         this.rvTask = findViewById(R.id.rv_Task)
         this.fobAddTask = findViewById(R.id.fab_AddTask)
-        this.tasksList = mutableListOf(
-            Task("Tarea 1", TaskCategory.Other),
-            Task("Tarea 2", TaskCategory.Daily),
-            Task("Tarea 3", TaskCategory.Personal),
-            Task("Tarea 4", TaskCategory.Weekly),
-            Task("Tarea 5", TaskCategory.Other)
-        )
     }
 
     private fun initUI() {
@@ -82,7 +85,7 @@ class MainActivity : AppCompatActivity() {
         // RecyclerView Tasks
         this.tasksAdapter =
             TasksAdapter(
-                this.tasksList,
+                this.repository.getList(),
                 { position -> this.onTaskSelected(position) },
                 { position -> this.onDeleteSelected(position) })
         this.rvTask.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
@@ -102,19 +105,15 @@ class MainActivity : AppCompatActivity() {
 
     // Funcion lambda de tareas
     private fun onTaskSelected(position: Int) {
-        val newTasks: List<Task> = this.filterList()
-        newTasks[position].selected = !newTasks[position].selected
+        this.getAllTask.execute(this.categoryList)[position].setState()
         this.tasksAdapter.notifyItemChanged(position)
         this.updateTasks()
     }
 
     // Funcion lambda de borrar tareas
     private fun onDeleteSelected(position: Int) {
-        val list = this.filterList()
-        val deleteTask = list[position]
-        this.tasksList.remove(deleteTask)
-        list.remove(deleteTask)
-        tasksAdapter.tasks = list
+        this.deleteTask.execute(this.getAllTask.execute(this.categoryList)[position])
+        tasksAdapter.tasks = this.getAllTask.execute(this.categoryList)
         this.tasksAdapter.notifyDataSetChanged()
     }
 
@@ -137,7 +136,10 @@ class MainActivity : AppCompatActivity() {
                     getString(R.string.task_category_weekly) -> TaskCategory.Weekly
                     else -> TaskCategory.Other
                 }
-                this.tasksList.add(Task(etTaskName.text.toString(), taskCategory))
+
+                this.addTask.execute(
+                    Task(etTaskName.text.toString(), taskCategory)
+                )
                 this.updateTasks()
                 dialog.hide()
             }
@@ -147,17 +149,8 @@ class MainActivity : AppCompatActivity() {
 
     // Actualiza el listado de tasks
     private fun updateTasks() {
-        tasksAdapter.tasks = this.filterList()
+        tasksAdapter.tasks = this.getAllTask.execute(this.categoryList)
         this.tasksAdapter.notifyDataSetChanged()
     }
 
-    // Retorla la lista actual de tareas
-    private fun filterList(): MutableList<Task> {
-        val categoriesSelected: List<TaskCategory> = this.categoryList.filter { x -> x.selected }
-        return if (categoriesSelected.isNotEmpty()) {
-            tasksList.filter { x -> categoriesSelected.contains(x.category) }.toMutableList()
-        }else {
-            this.tasksList
-        }
-    }
 }
