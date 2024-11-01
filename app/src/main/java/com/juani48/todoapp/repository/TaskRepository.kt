@@ -1,27 +1,26 @@
 package com.juani48.todoapp.repository
 
-import com.juani48.todoapp.application.TaskCategory
 import com.juani48.todoapp.application.entitys.Task
+import com.juani48.todoapp.application.entitys.toDomain
+import com.juani48.todoapp.repository.dao.TaskDAO
+import com.juani48.todoapp.repository.entity.toDataBase
+import javax.inject.Inject
 
-class TaskRepository() {
+class TaskRepository @Inject constructor(private val taskDao: TaskDAO) {
 
-    private var list: MutableList<Task> = mutableListOf(
-        Task("Tarea 1", TaskCategory.Other),
-        Task("Tarea 2", TaskCategory.Daily),
-        Task("Tarea 3", TaskCategory.Personal),
-        Task("Tarea 4", TaskCategory.Weekly),
-        Task("Tarea 5", TaskCategory.Other)
-    )
-
-    public fun getList(): List<Task> {
-        return this.list
+    suspend fun getAllTask(): List<Task>{
+        return this.taskDao.getAllTask().map { it.toDomain() }
     }
 
-    public fun addElement(task: Task) {
-        this.list.add(task)
+    suspend fun addTask(task: Task){
+        this.taskDao.addTask(task.toDataBase())
     }
 
-    public fun removeElement(task: Task) {
-        this.list.remove(task)
+    suspend fun deleteTask(task: Task){
+        this.taskDao.deleteTask(task.toDataBase())
+    }
+
+    suspend fun updateTask(task: Task){
+        this.taskDao.updateTask(task.toDataBase())
     }
 }
