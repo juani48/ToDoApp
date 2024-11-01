@@ -30,7 +30,6 @@ class MainActivity : AppCompatActivity() {
     // RecyclerView TasksAdapter
     private lateinit var tasksAdapter: TasksAdapter
 
-
     // Dynamic Binding
     private lateinit var binding: ActivityMainBinding
 
@@ -116,5 +115,4 @@ class MainActivity : AppCompatActivity() {
         }
         dialog.show()
     }
-
 }

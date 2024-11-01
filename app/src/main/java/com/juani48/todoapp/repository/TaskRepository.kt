@@ -1,6 +1,5 @@
 package com.juani48.todoapp.repository
 
-import android.util.Log
 import com.juani48.todoapp.application.entitys.Task
 import com.juani48.todoapp.application.entitys.toDomain
 import com.juani48.todoapp.repository.dao.TaskDAO

@@ -9,5 +9,4 @@ class DeleteTaskUseCase @Inject constructor(private val repository: TaskReposito
     suspend fun execute(task: Task){
         this.repository.deleteTask(task)
     }
-
 }

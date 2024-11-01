@@ -2,7 +2,6 @@ package com.juani48.todoapp.application.entitys
 
 import com.juani48.todoapp.repository.entity.TaskEntity
 
-
 data class Task(
     val id: Int = 0,
     var name: String,
@@ -19,3 +18,4 @@ private fun parseCategory(string: String): TaskCategory {
         else -> TaskCategory.Other
     }
 }
+

@@ -6,7 +6,6 @@ plugins {
     //Dagger Hilt
     id("com.google.dagger.hilt.android")
     id("kotlin-kapt")
-
 }
 
 android {
