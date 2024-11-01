@@ -26,22 +26,22 @@ class TasksViewHolder(
     fun render(task: Task) {
         this.itemView.setOnClickListener { this.onTaskSelected(layoutPosition) }
         this.ivDeleteImage.setOnClickListener { this.onDeleteSelected(layoutPosition) }
-        this.tvTaskName.text = task.getName()
+        this.tvTaskName.text = task.name
 
-        if (task.getState()) {
+        if (task.selected) {
             tvTaskName.paintFlags = tvTaskName.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
         } else {
             tvTaskName.paintFlags = tvTaskName.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
         }
 
-        val color = when (task.getCategory()) {
+        val color = when (task.category) {
             TaskCategory.Daily -> R.color.my_daily_color
             TaskCategory.Personal -> R.color.my_personal_color
             TaskCategory.Weekly -> R.color.my_weekly_color
             else -> R.color.my_other_color
         }
 
-        this.cbTask.isChecked = task.getState()
+        this.cbTask.isChecked = task.selected
         this.cbTask.buttonTintList =
             ColorStateList.valueOf(ContextCompat.getColor(this.cbTask.context, color))
         this.cbTask.setOnClickListener { this.onTaskSelected(layoutPosition) }
