@@ -1,14 +1,12 @@
 package com.juani48.todoapp.items.categories
 
-import android.content.Context
-import android.graphics.Color
 import android.view.View
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.juani48.todoapp.R
-import com.juani48.todoapp.application.TaskCategory
+import com.juani48.todoapp.application.entitys.TaskCategory
 
 class CategoriesViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 

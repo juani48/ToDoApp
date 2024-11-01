@@ -4,11 +4,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.juani48.todoapp.R
-import com.juani48.todoapp.application.TaskCategory
+import com.juani48.todoapp.application.entitys.TaskCategory
 
 //"Pinta" cada elementos de la lista ´categories´
 class CategoriesAdapter(
-    private val categories: List<TaskCategory>,
+    public var categories: List<TaskCategory>,
     private val onCategorySelected: (Int) -> Unit)
     : RecyclerView.Adapter<CategoriesViewHolder>() {
 

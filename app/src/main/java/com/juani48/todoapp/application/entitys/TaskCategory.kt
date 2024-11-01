@@ -1,4 +1,4 @@
-package com.juani48.todoapp.application
+package com.juani48.todoapp.application.entitys
 
 
 sealed class TaskCategory(public var selected: Boolean = false) {
