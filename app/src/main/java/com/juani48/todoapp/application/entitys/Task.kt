@@ -1,19 +1,21 @@
 package com.juani48.todoapp.application.entitys
 
-import com.juani48.todoapp.application.TaskCategory
+import com.juani48.todoapp.repository.entity.TaskEntity
 
-class Task(
-    private var name: String,
-    private var category: TaskCategory,
-    private var selected: Boolean = false
-){
-    public fun getName(): String = this.name
-    public fun getCategory(): TaskCategory = this.category
-    public fun getState(): Boolean = this.selected
+data class Task(
+    val id: Int = 0,
+    var name: String,
+    var category: TaskCategory,
+    var selected: Boolean = false
+)
+fun TaskEntity.toDomain() = Task(id = id,name = name, category = parseCategory(category), selected = selected)
 
-    public fun setState(){
-        this.selected = !this.selected
+private fun parseCategory(string: String): TaskCategory {
+    return when(string){
+        "Personal" -> TaskCategory.Personal
+        "Weekly" -> TaskCategory.Weekly
+        "Daily" -> TaskCategory.Daily
+        else -> TaskCategory.Other
     }
-
-    public fun equlas(task: Task): Boolean = this.getName() == task.getName() && this.getCategory() == task.getCategory()
 }
+

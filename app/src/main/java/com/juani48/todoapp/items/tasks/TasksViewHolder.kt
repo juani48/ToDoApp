@@ -6,11 +6,10 @@ import android.view.View
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.juani48.todoapp.R
-import com.juani48.todoapp.application.TaskCategory
+import com.juani48.todoapp.application.entitys.TaskCategory
 import com.juani48.todoapp.application.entitys.Task
 
 class TasksViewHolder(
@@ -24,7 +23,7 @@ class TasksViewHolder(
     private var cbTask: CheckBox = view.findViewById(R.id.cb_TaskColor)
     private var ivDeleteImage: ImageView = view.findViewById(R.id.iv_DeleteImage)
 
-    public fun render(task: Task) {
+    fun render(task: Task) {
         this.itemView.setOnClickListener { this.onTaskSelected(layoutPosition) }
         this.ivDeleteImage.setOnClickListener { this.onDeleteSelected(layoutPosition) }
         this.tvTaskName.text = task.getName()
@@ -37,9 +36,9 @@ class TasksViewHolder(
 
         val color = when (task.getCategory()) {
             TaskCategory.Daily -> R.color.my_daily_color
-            TaskCategory.Other -> R.color.my_other_color
             TaskCategory.Personal -> R.color.my_personal_color
             TaskCategory.Weekly -> R.color.my_weekly_color
+            else -> R.color.my_other_color
         }
 
         this.cbTask.isChecked = task.getState()
