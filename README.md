@@ -1,4 +1,4 @@
-# ToDoApp
+# ToDoApp v1.0
 ToDoApp is a simple project to implement and research new knowledge and reflect it in an app that displays a list of tasks to be done.
 
 # Technologies and Progress
